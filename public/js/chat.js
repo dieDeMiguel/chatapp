@@ -21,8 +21,8 @@ const autoscroll = () => {
     const $newMessage = $messages.lastElementChild
 
     // Height of the new message
-    const newMessageStyles = getComputedStyle($newMessage)
-    const newMessageMargin = parseInt(newMessageStyles.marginBottom)
+    const newMessageStyles = getComputedStyle($newMessage);
+    const newMessageMargin = parseInt(newMessageStyles.marginBottom);
     const newMessageHeight = $newMessage.offsetHeight + newMessageMargin
 
     // Visible height
@@ -34,9 +34,21 @@ const autoscroll = () => {
     // How far have I scrolled?
     const scrollOffset = $messages.scrollTop + visibleHeight
 
-    if (containerHeight - newMessageHeight <= scrollOffset) {
+    //Conditional Statement to check whether or not the messages container is scrolled up, if it's scrolled up
+    //then the last message will position down not showing, if the conatainer is in the lower part of the
+    //messages container then the new messages will be shown
+    if (containerHeight - newMessageHeight - 1 <= scrollOffset) {
         $messages.scrollTop = $messages.scrollHeight
     }
+
+    const containerHeightMinusNewMessageHeight = containerHeight - newMessageHeight;
+
+    function scroll(containerHeightMinusNewMessageHeight, scrollOffset) {
+        return containerHeightMinusNewMessageHeight <= scrollOffset
+    }
+    console.log('containerHeight -  newMessageHeight: ' + containerHeightMinusNewMessageHeight);
+    console.log('scrollOffset: ' + scrollOffset);
+    //console.log(scroll());
 }
 
 socket.on('message', (message) => {
