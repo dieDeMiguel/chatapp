@@ -14,7 +14,28 @@ const sidebarTemplate = document.querySelector('#sidebar-template').innerHTML;
 
 //Options, we obtain the username and the chat room from the querystring, the ignoreQueryPrefix option
 //removes the "?" from the beginning of the query string.
-const {username, room} = Qs.parse(location.search, { ignoreQueryPrefix: true});
+//options
+const { username, createRoom, joinRoom } = Qs.parse(location.search, { ignoreQueryPrefix: true })
+
+// check joining choice
+const roomCheck = () =>{
+
+    console.log(createRoom);
+    console.log(joinRoom);
+    
+    if(createRoom && joinRoom){
+        alert("Create a room OR select an existing one")
+        location.href = '/'
+        return
+    }
+    
+    return createRoom ? createRoom : joinRoom
+}
+
+const room = roomCheck()
+console.log('room', room);
+
+
 
 const autoscroll = () => {
     // New message element
@@ -40,19 +61,10 @@ const autoscroll = () => {
     if (containerHeight - newMessageHeight - 1 <= scrollOffset) {
         $messages.scrollTop = $messages.scrollHeight
     }
-
-    const containerHeightMinusNewMessageHeight = containerHeight - newMessageHeight;
-
-    function scroll(containerHeightMinusNewMessageHeight, scrollOffset) {
-        return containerHeightMinusNewMessageHeight <= scrollOffset
-    }
-    console.log('containerHeight -  newMessageHeight: ' + containerHeightMinusNewMessageHeight);
-    console.log('scrollOffset: ' + scrollOffset);
-    //console.log(scroll());
 }
 
 socket.on('message', (message) => {
-    console.log(message)
+    //console.log(message)
     const html = Mustache.render(messageTemplate, {
         username: message.username,
         message: message.text,
@@ -117,11 +129,11 @@ $sendLocationButton.addEventListener('click', () => {
             console.log('Location shared!')  
         })
     })
-});
+})
 
 socket.emit('join', {username, room}, (error)=> {
     if(error) {
         alert(error)
         location.href = '/';
     }
-});
+})

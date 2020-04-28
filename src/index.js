@@ -5,6 +5,7 @@ const socketio = require('socket.io')
 const Filter = require('bad-words')
 const { generateMessage, generateLocationMessage } = require('./utils/messages');
 const { addUser, removeUser, getUser, getUsersInRoom} = require('./utils/users');
+const { addNewRoom, removeRoom, getAllRooms } = require('./utils/rooms');
 
 const app = express()
 const server = http.createServer(app)
@@ -13,21 +14,27 @@ const io = socketio(server)
 const port = process.env.PORT || 3000
 const publicDirectoryPath = path.join(__dirname, '../public')
 
-app.use(express.static(publicDirectoryPath))
+app.use(express.static(publicDirectoryPath));
+
+
 
 io.on('connection', (socket) => {
+
     console.log('New WebSocket connection')
+     // while joining the chat
+     socket.on('join', (options, callback) => {
+        const { error, user } = addUser({ id: socket.id, ...options})
 
-    socket.on('join', (options, callback) => {
-        const { error, user } = addUser({ id: socket.id, ...options })
-
-        if (error) {
+        if(error){
             return callback(error)
         }
-
+        
+        addNewRoom(user.room)
+        
         socket.join(user.room)
 
         socket.emit('message', generateMessage('Admin', 'Welcome: ' + user.username))
+
         socket.broadcast.to(user.room).emit('message', generateMessage('Admin', `${user.username} has joined!`))
         io.to(user.room).emit('roomData', {
             room: user.room,
@@ -51,12 +58,17 @@ io.on('connection', (socket) => {
         const user = getUser(socket.id)
         io.to(user.room).emit('locationMessage', generateLocationMessage(user.username, `https://google.com/maps?q=${coords.latitude},${coords.longitude}`))
         callback()
+    });
+
+    // list of available rooms
+    socket.on('roomsListQuery', () => {
+        socket.emit('roomsList', getAllRooms())
     })
 
     socket.on('disconnect', () => {
         const user = removeUser(socket.id)
-
         if (user) {
+            removeRoom(user.room);
             io.to(user.room).emit('message', generateMessage('Admin', `${user.username} has left!`));
             io.to(user.room).emit('roomData', {
                 room: user.room,

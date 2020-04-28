@@ -1,6 +1,7 @@
 const users = [];
 
 const addUser = ({id, username, room}) => { 
+    console.log(username, room)
     username = username.trim().toLowerCase();
     room = room.trim().toLowerCase();
     //Sanitizing data from the client
@@ -26,7 +27,6 @@ const addUser = ({id, username, room}) => {
     const user = {id, username, room};
     users.push(user);
     return { user }
-
 };
 
 const removeUser = (id) => {
@@ -51,25 +51,6 @@ const getUsersInRoom = (room) => {
     return users.filter((user) => user.room === room);
 };
 
-// const diego = addUser({
-//     id: 33,
-//     username: 'Diego',
-//     room: 'audiok'
-// });
-
-// addUser({
-//     id: 37,
-//     username: 'juan',
-//     room: 'audio'
-// });
-
-// addUser({
-//     id: 97,
-//     username: 'pedro',
-//     room: 'audio'
-// });
-
-
 
 module.exports =  {
     addUser,
@@ -77,3 +58,4 @@ module.exports =  {
     getUser,
     getUsersInRoom
 }
+
