@@ -4,6 +4,7 @@ const rooms = [];
 
 const addNewRoom = (newRoom) => {
    
+    console.log(rooms)
     newRoom = newRoom.trim().toLowerCase();
 
     const isRoomExisting = rooms.find((room) => room === newRoom);
